@@ -2,23 +2,28 @@ package services;
 
 import models.FuncionarioModel;
 import repositories.FuncionarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
 @Service
 public class FuncionarioServices {
 
-   @Autowired
-   private FuncionarioRepository funcionarioRepository;
+   private final FuncionarioRepository funcionarioRepository;
+
+   public FuncionarioServices(FuncionarioRepository funcionarioRepository) {
+       this.funcionarioRepository = funcionarioRepository;
+   }
 
    public List<FuncionarioModel> findAll(){
        return  funcionarioRepository.findAll();
    }
 
    public FuncionarioModel buscarPorId(Long id){
-       return  funcionarioRepository.findById(id).get();
+       return funcionarioRepository.findById(id)
+               .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
    }
 
    public FuncionarioModel criarPessoa(FuncionarioModel funcionarioModel) {
@@ -31,14 +36,13 @@ public class FuncionarioServices {
     }
     //atualizar
     public FuncionarioModel atualizar(Long id, FuncionarioModel funcionarioModel){
-       FuncionarioModel func = funcionarioRepository.findById(id).get();
+       FuncionarioModel func = funcionarioRepository.findById(id)
+               .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Funcionário não encontrado"));
        func.setNome(funcionarioModel.getNome());
        func.setCpf(funcionarioModel.getCpf());
-       return  funcionarioRepository.save(func);
+       func.setRua(funcionarioModel.getRua());
+       return funcionarioRepository.save(func);
     }
-
-
-
 
 
 

@@ -3,17 +3,20 @@ package controllers;
 
 import models.FuncionarioModel;
 import services.FuncionarioServices;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/funcionarios")
+@RequestMapping("/api/funcionarios")
 public class FuncionarioController {
 
-    @Autowired
-    private FuncionarioServices funcionarioServices;
+    private final FuncionarioServices funcionarioServices;
+
+    public FuncionarioController(FuncionarioServices funcionarioServices) {
+        this.funcionarioServices = funcionarioServices;
+    }
 
     @GetMapping
     public List<FuncionarioModel> findAll(){
@@ -26,13 +29,15 @@ public class FuncionarioController {
     }
 
     @DeleteMapping("/{id}")
-    public void deletar( @PathVariable Long id){
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletar(@PathVariable Long id){
         funcionarioServices.deletar(id);
     }
 
     @PostMapping
-    public FuncionarioModel criarFuncionario( @RequestBody  FuncionarioModel funcionarioModel){
-        return  funcionarioServices.criarPessoa(funcionarioModel);
+    @ResponseStatus(HttpStatus.CREATED)
+    public FuncionarioModel criarFuncionario(@RequestBody FuncionarioModel funcionarioModel){
+        return funcionarioServices.criarPessoa(funcionarioModel);
     }
 
     @PutMapping("/{id}")
